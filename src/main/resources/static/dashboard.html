@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+
+<h2>Dashboard 🔐</h2>
+
+<p id="bienvenida"></p>
+
+<button onclick="logout()">Cerrar sesión</button>
+
+<script>
+    // Obtener usuario guardado
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+    if (!usuario) {
+        // Si no hay sesión, volver al login
+        window.location.href = "login.html";
+    } else {
+        document.getElementById("bienvenida").innerText =
+            `Bienvenido ${usuario.nombre} (${usuario.email})`;
+    }
+
+    function logout() {
+        localStorage.removeItem("usuario");
+        window.location.href = "login.html";
+    }
+</script>
+
+</body>
+</html>
