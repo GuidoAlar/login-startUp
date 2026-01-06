@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Egresos</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background-color: #f5f7f6;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #5ec7a5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        label {
+            font-size: 14px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        textarea {
+            grid-column: span 2;
+            resize: none;
+        }
+
+        button {
+            grid-column: span 2;
+            padding: 12px;
+            border-radius: 25px;
+            border: none;
+            background-color: #5ec7a5;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4bb493;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        .scroll {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Mis Egresos</h1>
+
+<div class="container">
+
+    <!-- FORMULARIO -->
+    <form id="egresoForm">
+
+        <div>
+            <label>Concepto</label>
+            <input type="text" id="concepto" required>
+        </div>
+
+        <div>
+            <label>Fecha</label>
+            <input type="date" id="fecha" required>
+        </div>
+
+        <div>
+            <label>Tipo</label>
+            <select id="tipo">
+                <option value="fijo">Fijo</option>
+                <option value="variable">Variable</option>
+                <option value="unico">Único</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Monto</label>
+            <input type="number" step="0.01" id="monto" required>
+        </div>
+
+        <div style="grid-column: span 2;">
+            <label>Descripción</label>
+            <textarea id="descripcion" rows="3"></textarea>
+        </div>
+
+        <button type="submit">Guardar egreso</button>
+    </form>
+
+    <!-- TABLA -->
+    <div class="scroll">
+        <table>
+            <thead>
+            <tr>
+                <th>Concepto</th>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Monto</th>
+                <th>Descripción</th>
+            </tr>
+            </thead>
+            <tbody id="tablaEgresos"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    const idUsuario = 1; // 👈 luego se reemplaza por sesión real
+
+    const form = document.getElementById("egresoForm");
+    const tabla = document.getElementById("tablaEgresos");
+
+    // ✅ Guardar egreso
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const egreso = {
+            concepto: document.getElementById("concepto").value,
+            fecha: document.getElementById("fecha").value,
+            tipo: document.getElementById("tipo").value,
+            monto: document.getElementById("monto").value,
+            descripcion: document.getElementById("descripcion").value
+        };
+
+        await fetch(`http://localhost:8080/api/egresos/${idUsuario}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(egreso)
+        });
+
+        form.reset();
+        cargarEgresos();
+    });
+
+    // ✅ Listar egresos
+    async function cargarEgresos() {
+        const res = await fetch(`http://localhost:8080/api/egresos/${idUsuario}`);
+        const egresos = await res.json();
+
+        tabla.innerHTML = "";
+
+        egresos.forEach(e => {
+            const fila = `
+                <tr>
+                    <td>${e.concepto}</td>
+                    <td>${e.fecha}</td>
+                    <td>${e.tipo}</td>
+                    <td>S/ ${e.monto}</td>
+                    <td>${e.descripcion ?? ""}</td>
+                </tr>
+            `;
+            tabla.innerHTML += fila;
+        });
+    }
+
+    cargarEgresos();
+</script>
+
+</body>
+</html>

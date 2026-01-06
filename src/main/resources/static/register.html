@@ -3,43 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <title>Registro</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background-color: #f5f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 900px;
+            height: 520px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* PANEL IZQUIERDO */
+        .left {
+            width: 50%;
+            background-color: #5ec7a5;
+            color: #155f4a;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .left h2 {
+            margin-bottom: 10px;
+        }
+
+        .left p {
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .owl {
+            font-size: 120px;
+        }
+
+        /* PANEL DERECHO */
+        .right {
+            width: 50%;
+            padding: 40px;
+        }
+
+        .right h2 {
+            color: #5ec7a5;
+            margin-bottom: 5px;
+        }
+
+        .right h1 {
+            color: #7ac70c;
+            margin-top: 0;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            font-size: 13px;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 25px;
+            border: none;
+            background-color: #5ec7a5;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4bb493;
+        }
+
+        .login-link {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #5ec7a5;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-size: 13px;
+            text-align: center;
+        }
+    </style>
 </head>
+
 <body>
 
-<h2>Crear cuenta</h2>
+<div class="container">
 
-<form id="registerForm">
-    <input type="text" placeholder="Nombre" id="nombre" required><br>
-    <input type="text" placeholder="Apellido" id="apellido" required><br>
-    <input type="email" placeholder="Email" id="email" required><br>
-    <input type="password" placeholder="Contraseña" id="password" required><br>
-    <input type="text" placeholder="Teléfono" id="telefono"><br>
-    <button type="submit">Registrar</button>
-</form>
+    <!-- PANEL IZQUIERDO -->
+    <div class="left">
+        <h2>Adaptable a cada usuario</h2>
+        <p>Aprende de tus hábitos, entiende tus metas y automatiza tus ahorros.</p>
+        <div class="owl">🦉</div>
+    </div>
 
-<p id="mensaje"></p>
+    <!-- PANEL DERECHO -->
+    <div class="right">
+        <h2>¡Hola! Somos</h2>
+        <h1>duolingo</h1>
+
+        <p>Comience por crear una cuenta</p>
+
+        <form id="registerForm">
+            <label>Nombre</label>
+            <input type="text" id="nombre" required>
+
+            <label>Apellido</label>
+            <input type="text" id="apellido" required>
+
+            <label>Correo electrónico</label>
+            <input type="email" id="email" required>
+
+            <label>Contraseña</label>
+            <input type="password" id="password" required>
+
+            <button type="submit">Registrarse</button>
+
+            <p class="error" id="error"></p>
+
+            <div class="login-link">
+                <a href="login.html">Ya tengo una cuenta</a>
+            </div>
+        </form>
+    </div>
+
+</div>
 
 <script>
-document.getElementById("registerForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
+    const form = document.getElementById("registerForm");
 
-    const data = {
-        nombre: nombre.value,
-        apellido: apellido.value,
-        email: email.value,
-        password: password.value,
-        telefono: telefono.value
-    };
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-    const res = await fetch("http://localhost:8080/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        const usuario = {
+            nombre: document.getElementById("nombre").value,
+            apellido: document.getElementById("apellido").value,
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+        };
+
+        try {
+            const response = await fetch("http://localhost:8080/api/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(usuario)
+            });
+
+            if (response.ok) {
+                alert("Registro exitoso 🎉");
+                window.location.href = "login.html";
+            } else {
+                document.getElementById("error").innerText =
+                    "Error al registrar usuario";
+            }
+        } catch (err) {
+            document.getElementById("error").innerText =
+                "No se pudo conectar con el servidor";
+        }
     });
-
-    const result = await res.json();
-    document.getElementById("mensaje").innerText = result.message || "Registrado";
-});
 </script>
 
 </body>

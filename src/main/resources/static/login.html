@@ -3,59 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background-color: #f5f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 900px;
+            min-height: 520px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* PANEL IZQUIERDO */
+        .left {
+            width: 50%;
+            background-color: #5ec7a5;
+            color: #155f4a;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-radius: 20px 0 0 20px;
+        }
+
+        .left h2 {
+            margin-bottom: 10px;
+        }
+
+        .left p {
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .owl {
+            font-size: 120px;
+        }
+
+        /* PANEL DERECHO */
+        .right {
+            width: 50%;
+            padding: 40px;
+        }
+
+        .right h2 {
+            color: #5ec7a5;
+            margin-bottom: 5px;
+        }
+
+        .right h1 {
+            color: #7ac70c;
+            margin-top: 0;
+        }
+
+        form {
+            margin-top: 30px;
+        }
+
+        label {
+            font-size: 13px;
+            color: #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 25px;
+            border: none;
+            background-color: #5ec7a5;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #4bb493;
+        }
+
+        .register-link {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .register-link a {
+            color: #5ec7a5;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-size: 13px;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 
-<h2>Iniciar sesión</h2>
+<div class="container">
 
-<form id="loginForm">
-    <input type="email" id="email" placeholder="Email" required><br>
-    <input type="password" id="password" placeholder="Contraseña" required><br>
-    <button type="submit">Ingresar</button>
-</form>
+    <!-- IZQUIERDA -->
+    <div class="left">
+        <h2>¡Bienvenido de vuelta!</h2>
+        <p>Administra tus ingresos y egresos de forma inteligente.</p>
+        <div class="owl">🦉</div>
+    </div>
 
-<p id="mensaje"></p>
+    <!-- DERECHA -->
+    <div class="right">
+        <h2>Hola 👋</h2>
+        <h1>Inicia sesión</h1>
 
-<p>
-    ¿No tienes cuenta?
-    <a href="register.html">Crear cuenta</a>
-</p>
+        <form id="loginForm">
+            <label>Correo electrónico</label>
+            <input type="email" id="email" required>
+
+            <label>Contraseña</label>
+            <input type="password" id="password" required>
+
+            <button type="submit">Ingresar</button>
+
+            <p class="error" id="error"></p>
+
+            <div class="register-link">
+                <a href="register.html">¿No tienes cuenta? Regístrate</a>
+            </div>
+        </form>
+    </div>
+
+</div>
 
 <script>
-document.getElementById("loginForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
+    const form = document.getElementById("loginForm");
 
-    const data = {
-        email: email.value,
-        password: password.value
-    };
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-    try {
-        const res = await fetch("http://localhost:8080/api/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        });
+        const datos = {
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+        };
 
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.message || "Error al iniciar sesión");
+        try {
+            const response = await fetch("http://localhost:8080/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(datos)
+            });
+
+            if (!response.ok) {
+                throw new Error("Credenciales incorrectas");
+            }
+
+            const usuario = await response.json();
+
+            // Guardar sesión (simple)
+            localStorage.setItem("usuario", JSON.stringify(usuario));
+
+            // Redirigir al dashboard
+            window.location.href = "dashboard.html";
+
+        } catch (error) {
+            document.getElementById("error").innerText =
+                "Correo o contraseña incorrectos";
         }
-
-        const user = await res.json();
-
-        // Guardar sesión simple
-        localStorage.setItem("usuario", JSON.stringify(user));
-
-        // Redirigir
-        window.location.href = "dashboard.html";
-
-    } catch (error) {
-        document.getElementById("mensaje").innerText = error.message;
-    }
-});
+    });
 </script>
 
 </body>
